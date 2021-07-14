@@ -1,0 +1,56 @@
+/*
+//-----------@Pranit E-Learnings-----------//
+Check Out for more INFO:
+https://pranitelearnings.blogspot.com/
+
+::::::::::::::CODE IS FOR BOTH LED AND LCD YOU CAN SEE THE OUTPUT ON BOHT::::::::::::::
+*/
+#include<LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x3F,16,02) ;
+// constants won't change
+const int TRIG_PIN = 6; // Arduino pin connected to Ultrasonic Sensor's TRIG pin
+const int ECHO_PIN = 7; // Arduino pin connected to Ultrasonic Sensor's ECHO pin
+const int LED_PIN  = 3; // Arduino pin connected to LED's pin
+const int DISTANCE_THRESHOLD = 50; // centimeters
+
+// variables will change:
+float duration_us, distance_cm;
+
+void setup() {
+  Serial.begin (9600);       // initialize serial port
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("DISTANCE MEASUREMENT");
+  pinMode(TRIG_PIN, OUTPUT); // set arduino pin to output mode
+  pinMode(ECHO_PIN, INPUT);  // set arduino pin to input mode
+  pinMode(LED_PIN, OUTPUT);  // set arduino pin to output mode
+}
+
+void loop() {
+  // generate 10-microsecond pulse to TRIG pin
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  // measure duration of pulse from ECHO pin
+  duration_us = pulseIn(ECHO_PIN, HIGH);
+  // calculate the distance
+  distance_cm = 0.017 * duration_us;
+
+  if(distance_cm < DISTANCE_THRESHOLD)
+    digitalWrite(LED_PIN, HIGH); // turn on LED
+  else
+    digitalWrite(LED_PIN, LOW);  // turn off LED
+
+  // print the value to Serial Monitor
+  Serial.print("distance: ");
+  lcd.setCursor(0,1);
+  Serial.print(distance_cm);
+  lcd.print(distance_cm);
+  Serial.println(" cm");
+  lcd.setCursor(7,1);
+  lcd.print(" cm");
+
+  delay(500);
+}
